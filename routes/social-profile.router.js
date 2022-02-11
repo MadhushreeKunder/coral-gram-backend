@@ -9,9 +9,11 @@ const {extend} = require("lodash");
 const { User } = require("../models/user.model");
 const { SocialProfile } = require("../models/social-profile.model");
 const { authVerify } = require("../middlewares/auth-handler.middleware");
+const { getViewerDetailsFromDb } = require("../middlewares/get-viewer-details-from-db");
+
 const { getNameFromSocialProfile } = require("../utils/get-name-from-social-profile");
-const { getViewerDetailsFromDb } = require("../utils/get-viewer-details-from-db");
 const { getUserProfileCleaned } = require("../utils/get-user-profile-cleaned");
+const { getIsFollowedByViewer } = require("../utils/get-is-followed-by-viewer");
 
 
 router.post('/signup', async(req, res) => {
@@ -215,9 +217,62 @@ router.route('/:userName/followers')
   } catch(error){
     console.log(error);
     res.status(500).json({
+      success: false,
       message: "Request failed, check errorMessage for more details",
       errorMessage: error.message,  
     });
+  }
+})
+.post( async (req, res) => {
+  try {
+    const {viewer}= req;
+    const { userName} = req.params;
+
+    let userDetails = await SocialProfile.findOne({ userName});
+    
+    let isAdded = false;
+    if(!userDetails || userName === viewer.userName){
+      res.status(400).json({ message: "Invalid request"});
+      return;
+    }
+
+    if (viewer.following.includes(userDetails._id)){
+      viewer.following = viewer.following.filter(
+        (id) => id.toString() !== userDetails._id.toString(),
+      );
+      userDetails.followers = userDetails.followers.filter(
+        (id) => id.toString() !== viewer._id.toString(),
+      );
+
+      await pushFollowActivityInNotification({
+        userIdWhoFollowed: viewer._id,
+        otherUserId: userDetails._id,
+        type: "unfollow",
+      });
+    } else {
+      viewer.following.unshift(userDetails._id);
+      userDetails.followers.unshift(viewer._id);
+      isAdded = true;
+
+      await pushFollowActivityInNotification({
+         userIdWhoFollowed: viewer._id,
+        otherUserId: userDetails._id,
+        type: "follow",
+      });
+
+      await viewer.save();
+      await userDetails.save();
+      res.status(200).json({isAdded});
+
+    }
+
+  } catch(error){
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Request failed, check errorMessage for more details",
+      errorMessage: error.message,  
+    })
   }
 })
 
