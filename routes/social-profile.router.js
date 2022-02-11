@@ -14,6 +14,7 @@ const { getViewerDetailsFromDb } = require("../middlewares/get-viewer-details-fr
 const { getNameFromSocialProfile } = require("../utils/get-name-from-social-profile");
 const { getUserProfileCleaned } = require("../utils/get-user-profile-cleaned");
 const { getIsFollowedByViewer } = require("../utils/get-is-followed-by-viewer");
+const { pushFollowActivityInNotification } = require("../utils/notifications");
 
 
 router.post('/signup', async(req, res) => {
