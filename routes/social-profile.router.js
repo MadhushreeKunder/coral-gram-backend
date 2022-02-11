@@ -10,6 +10,10 @@ router.post('/signup', async(req, res) => {
 
     const user = await User.findOne({ email: UserData.email});
 
+    if (user) {
+      return res.status(409).json({success: false, message: "Account already exists"});
+    }
+
     const userNameExists = await SocialProfile.findOne({userName: UserData.userName});
 
     if(userNameExists){
