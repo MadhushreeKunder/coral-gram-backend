@@ -1,8 +1,8 @@
 var mongoose = require('mongoose');
 const { Schema} = mongoose;
 
-const PostSchema = new Schema(
-  {
+const PostSchema = new Schema({
+
     userId: {
       type: Schema.Types.ObjectId,
       ref: 'SocialProfile',
@@ -27,8 +27,8 @@ const PostSchema = new Schema(
       ],  
   }, {
     timestamps: true,
-  }
-);
+  
+});
 
 const Post = mongoose.model('Post', PostSchema);
 
