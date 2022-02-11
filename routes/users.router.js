@@ -40,4 +40,47 @@ router.route('/')
 			errorMessage: error.message,
 		});
 	}
-})
+})  
+
+
+router.route('/authenticate')
+.post( async(req, res) => {
+  try {
+    const email = req.get('email');
+    const password = req.get('password');
+    const user = await USer.findOne({email});
+
+    if(!user){
+      res.status(403).json({
+        success: false,
+        message: "Email or password is incorrect"
+      });
+    } else {
+      const validPassword = await bcrypt.compare(password, user.password);
+
+      if(validPassword){
+        const token = generateToken(user._id);
+        res.status(200).json({
+            response: {
+          username: NewUser.username, token
+        }
+      })
+    
+      } else {
+        res.status(403).json({ 
+          success: false,
+          message: "Email or password is incorrect"
+        })
+      }
+    }
+  } catch(error){
+    console.error(error);
+		res.status(500).json({
+      success: false,
+			message: 'Something went wrong!',
+			errorMessage: error.message,
+		});
+  }
+})    
+
+   
