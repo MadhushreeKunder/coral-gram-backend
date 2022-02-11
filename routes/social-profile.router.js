@@ -275,7 +275,79 @@ router.route('/:userName/followers')
       errorMessage: error.message,  
     })
   }
-})
+});
 
+
+
+router.route("/:userName/following")
+.get( async(req, res) => {
+  try {
+    const { userName } = req.params;
+    const { viewer } = req;
+
+    let userDetails = await SocialProfile.findOne({ userName})
+    .lean()
+    .populate({
+      path: "following",
+      select: "userName avatar followers"
+    });
+
+    if (!userDetails){
+      res.status(404).json({
+        message: "No user found"
+      });
+      return;
+    }
+
+    userDetails.following = userDetails.following.map((user)=> getIsFollowedByViewer(user, viewer._id), );
+
+    res.status(200).json({ response: userDetails.following});
+
+  } catch (error){
+    console.log(error);
+    
+    res.status(500).json({
+      message: "Request failed, check errorMessage for more details",
+      errorMessage: error.message
+    });
+
+  }
+})
+.post( async (req, res) => {
+  try {
+    const { viewer } = req;
+    const { userName} = req.params;
+
+    let userDetails = await SocialProfile.findOne({ userName});
+
+    if(!userDetails || userName === viewer.userName){
+      res.status(400).json({
+        message: "Invalid request"
+      });
+      return;
+    }
+
+    if (viewer.follower.includes(userDetails._id)){
+      viewer.followers = viewer.followers.filter((id) => id.toString() !== userDetails._id.toString(),
+      );
+      userDetails.following = userDetails.following.filter((id) => id.toString() !== viewer._id.toString());
+    } else {
+      res.status(400).json({ message: "Invalid request"});
+      return;
+    }
+
+    await viewer.save();
+    await userDetails.save();
+
+    res.status(200).json({ isAdded: false});
+
+  } catch(error){
+    console.log(error);
+    res.status(500).json({
+      message: "Request failed, please check error message for more details",
+      errorMessage: error.message
+    });
+  }
+})
 
 
