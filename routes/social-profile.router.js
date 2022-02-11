@@ -3,11 +3,15 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 const jwt_secret = process.env['JWT_SECRET'];
 const bcrypt = require("bcrypt");
-const { User} = require("../models/user.model");
-const {SocialProfile} = require("../models/social-profile.model");
-const { authVerify} = require("../middlewares/auth-handler.middleware");
-const {getNameFromSocialProfile} = require("../utils/get-name-from-social-profile")
+const {extend} = require("lodash"); 
 
+
+const { User } = require("../models/user.model");
+const { SocialProfile } = require("../models/social-profile.model");
+const { authVerify } = require("../middlewares/auth-handler.middleware");
+const { getNameFromSocialProfile } = require("../utils/get-name-from-social-profile");
+const { getViewerDetailsFromDb } = require("../utils/get-viewer-details-from-db");
+const { getUserProfileCleaned } = require("../utils/get-user-profile-cleaned");
 
 
 router.post('/signup', async(req, res) => {
@@ -104,10 +108,12 @@ router.post("/login", async(req, res) => {
 });
 
 router.use(authVerify);
+router.use(getViewerDetailsFromDb);
 
 router.route('/')
 .get( async(req, res) => {
   try {
+    const { viewer} = req;
     let users = await SocialProfile.find(
       {},
       {userName: 1, userId: 1, avatar: 1, followers: 1}
@@ -115,7 +121,7 @@ router.route('/')
     .populate({path: 'userId', select: 'username'});
 
     for(let user of users){
-      user = getNameFromSocialProfile(user);
+      user = getNameFromSocialProfile(user, viewer._id);
     }
     res.status(200).json({success: true, response: users})
   } catch(error){
@@ -125,6 +131,63 @@ router.route('/')
       message: "Request failed, check errorMessage for more details",
       errorMessage: error.message,
     });
+  }
+});
+
+
+router.route('/:userName')
+.get(async (req, res)=> {
+  try {
+    const {viewer} = req;
+    const {username} = req.params;
+
+    let userDetails = await SocialProfile.findOne({ userName}).populate({
+      path: 'userId',
+      select: 'username'
+    });
+
+    if(!userDetails || !viewer){
+      res.status(403).json({success: false, message: "Inva;id user id"});
+      return;
+    }
+
+    userDetails = getSocialProfileCleaned(userDetails, viewer._id);
+    res.status(200).json({response: userDetails});
+
+  } catch(error){
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Request failed. Check errorMessage for more details",
+      errorMessage: error.message
+    })
+  }
+})
+.post(async (req, res) => {
+  try {
+    let {viewer} = req;
+    const {userName} = req.params;
+
+    if (userName !== viewer.userName){
+      res.status(403).json({message: "Invalid request"});
+      return;
+    }
+
+    const viewerUpdates = req.body;
+    viewer = extend(viewer, viewerUpdates);
+
+    await viewer.save();
+    res.status(200).json({ 
+      response: { bio: viewer.bio, link: viewer.link, avatar: viewer.avatar}
+    });
+
+  } catch (error){
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Request failed, check errorMessage for more details",
+      errorMessage: error.message;
+    })
   }
 });
 

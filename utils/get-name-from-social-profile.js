@@ -2,6 +2,9 @@ const getNameFromSocialProfile = (user) =>{
   console.log({user});
 
   user.name = user.userId.username;
+  
+  user.followedByViewer = !!user.followers.find((id) => id.toString() === viewerId.toString());
+
   user.followers = undefined;
   user.userId = undefined;
   return user;
