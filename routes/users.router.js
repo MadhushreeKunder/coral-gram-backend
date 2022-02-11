@@ -83,4 +83,27 @@ router.route('/authenticate')
   }
 })    
 
-   
+
+router.route('/self')
+.get( authVerify, async(req, res)=> {
+  try {
+    const {user} = req;
+
+    res.status(200).json({
+      response: {
+        email: user.email,
+        username: user.username
+      }
+    });
+  } catch(error){
+        console.error(error);
+		res.status(500).json({
+      success: false,
+			message: 'Something went wrong!',
+			errorMessage: error.message,
+		});
+
+  }
+})
+
+module.exports = router;
