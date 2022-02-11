@@ -56,5 +56,31 @@ router.route('/')
       errorMessage: error.message
     })
   }
-})
+});
+
+router.route("/:postId")
+.delete( async (req, res) => {
+  try {
+    const { postId} = req.params;
+    const { viewer} = req;
+
+    const post = await Post.findOne({ _id: postId, userId: viewer._id});
+
+    if(!post){
+      res.status(400).json({message: "No post found"});
+      return;
+    }
+    await post.remove();
+    await Notification.deleteMany({ likedPost: post._id});
+
+    res.status(200).json({ response: post._id});
+  } catch(error){
+      success: false,
+      message: "Request failed, please check error message for more details",
+      errorMessage: error.message
+
+  }
+});
+
+
  
