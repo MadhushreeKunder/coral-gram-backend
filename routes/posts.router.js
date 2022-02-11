@@ -167,7 +167,7 @@ router.route('/:postId/likedby')
     } else {
       post.likes.splice(index, 1);
       await pushLikeActivityInNotification({
-          userIdWhoLiked: viewer._id,
+        userIdWhoLiked: viewer._id,
 				otherUserId: post.userId,
 				likedPostId: post._id,
 				type: 'dislike',
