@@ -49,4 +49,49 @@ const pushFollowActivityInNotification = async ({
 };
 
 
-module.exports = { pushFollowActivityInNotification };
+const pushLikeActivityInNotification = async ({
+  userIdWhoLiked,
+  otherUserId,
+  likedPostId,
+  type,
+}) => {
+  try {
+    if ( userIdWhoLiked.toString() === otherUserId.toString()){
+      return;
+    }
+
+    if(type === "like"){
+      const activity = {
+        userId: otherUserId,
+        activityUserId: userIdWhoLiked,
+        activityTitle: activityTypes[type],
+        activityType: "like",
+        likedPost: likedPostId,
+      };
+      const newNotification = new Notification(activity);
+      await newNotification.save();
+
+      let notifications = await Notification.find({userId: otherUserId});
+      if (notifications.length > 10){
+        await notifications[0].remove();
+      }
+    }
+    if (type === "dislike"){
+      const notification = await Notification.findOne({
+        userId: otherUserId,
+        activityUserId: userIdWhoLiked,
+        likedPost: null,
+        activityType: "like"
+      });
+      if (notification){
+        await notification.remove();
+      }
+      
+    }
+  } catch(error){
+    console.log(error);
+  }
+};
+
+
+module.exports = { pushFollowActivityInNotification, pushLikeActivityInNotification };
