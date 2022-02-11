@@ -43,13 +43,13 @@ router.post('/signup', async(req, res) => {
     res.status(201).json({success: true, response: "Account created successfully"})
 
   } catch(error){
-    console.log(error){
+    console.log(error)
       res.status(500).json({
         success: false,
         message: "Request failed. See error message for more details",
         errorMessage: error.message
       });
-    }
+    
   }
 });
 
@@ -186,12 +186,40 @@ router.route('/:userName')
     res.status(500).json({
       success: false,
       message: "Request failed, check errorMessage for more details",
-      errorMessage: error.message;
+      errorMessage: error.message
     })
   }
 });
 
 
+router.route('/:userName/followers')
+.get( async (req, res) => {
+  try {
+    const { userName} = req.params;
+    const {viewer} = req;
+    let userDetails = await SocialProfile.findOne({ userName})
+    .lean()
+    .populate({
+      path: "followers",
+      select: "userName avatar followers"
+    });
+
+    if (!userDetails){
+      res.status(404).json({message: "User not found"});
+      return;
+    }
+    userDetails.followers = userDetails.followers.map((user)=> getIsFollowedByViewer(user, viewer._id));
+
+    res.status(200).json({success: true, response: userDetails.followers});
+
+  } catch(error){
+    console.log(error);
+    res.status(500).json({
+      message: "Request failed, check errorMessage for more details",
+      errorMessage: error.message,  
+    });
+  }
+})
 
 
 
