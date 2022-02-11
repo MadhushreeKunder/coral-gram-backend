@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 const { Schema} = mongoose;
+const { SocialProfile } = require('./social-profile.model');
 
 const PostSchema = new Schema({
 
