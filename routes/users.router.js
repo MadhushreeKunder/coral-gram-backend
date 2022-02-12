@@ -62,7 +62,7 @@ router.route('/authenticate')
         const token = generateToken(user._id);
         res.status(200).json({
             response: {
-          username: NewUser.username, token
+          username: user.username, token
         }
       })
     

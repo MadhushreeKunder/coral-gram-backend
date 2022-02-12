@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
@@ -5,7 +7,6 @@ const mongoose = require("mongoose");
 
 const { initialiseDBConnection } = require("./db/db.connect.js")
 
-require('dotenv').config();
 
 const users = require('./routes/users.router');
 const socialProfiles = require('./routes/social-profile.router');

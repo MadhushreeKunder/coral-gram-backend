@@ -37,6 +37,15 @@ const SocialProfileSchema = new Schema({
     },
   ],
   
+  bio: {
+		type: String,
+		default: '',
+	},
+	link: {
+		type: String,
+		default: '',
+	},
+  
 });
 
 const SocialProfile = mongoose.model('SocialProfile', SocialProfileSchema);

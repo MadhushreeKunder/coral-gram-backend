@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const jwt_secret = process.env['JWT_SECRET'];
+const {User} = require('../models/user.model');
 
 const authVerify = async (req, res, next) => {
 
