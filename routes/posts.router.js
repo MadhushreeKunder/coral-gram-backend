@@ -8,7 +8,7 @@ const {getPostCleaned} = require("../utils/get-post-cleaned");
 const {pushLikeActivityInNotification} = require("../utils/notifications");
 
 
-router.user(authVerify);
+router.use(authVerify);
 router.use(getViewerDetailsFromDb);
 
 router.route('/')
@@ -188,7 +188,7 @@ router.route('/:postId/likedby')
 
 
 
-
+module.exports = router;
 
 
  

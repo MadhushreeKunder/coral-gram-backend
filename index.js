@@ -7,7 +7,7 @@ const { initialiseDBConnection } = require("./db/db.connect.js")
 
 require('dotenv').config();
 
-const users = require('./routes/user.router');
+const users = require('./routes/users.router');
 const socialProfiles = require('./routes/social-profile.router');
 const posts = require('./routes/posts.router');
 

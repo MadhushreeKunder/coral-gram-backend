@@ -12,7 +12,7 @@ const { authVerify } = require("../middlewares/auth-handler.middleware");
 const { getViewerDetailsFromDb } = require("../middlewares/get-viewer-details-from-db");
 
 const { getNameFromSocialProfile } = require("../utils/get-name-from-social-profile");
-const { getUserProfileCleaned } = require("../utils/get-user-profile-cleaned");
+const { getSocialProfileCleaned } = require("../utils/get-social-profile-cleaned");
 const { getIsFollowedByViewer } = require("../utils/get-is-followed-by-viewer");
 const { pushFollowActivityInNotification } = require("../utils/notifications");
 
@@ -351,3 +351,4 @@ router.route("/:userName/following")
 })
 
 
+module.exports = router;

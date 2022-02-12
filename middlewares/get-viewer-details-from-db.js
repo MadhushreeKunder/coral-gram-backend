@@ -1,4 +1,4 @@
-const {SocialProfile} = require("../models/socialProfile.model");
+const {SocialProfile} = require("../models/social-profile.model");
 
 const getViewerDetailsFromDb = async (req, res, next) => {
 
