@@ -1,7 +1,9 @@
 const express = require("express");
 const authVerify = require("../middlewares/auth-handler.middleware");
 const router = express.Router();
-
+const {Post} = require('../models/post.model');
+const {SocialProfile} = require('../models/social-profile.model');
+const {Notification} = require('../models/notification.model');
 
 const { getViewerDetailsFromDb } = require("../middlewares/get-viewer-details-from-db");
 

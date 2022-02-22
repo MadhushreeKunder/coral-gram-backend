@@ -5,8 +5,9 @@ const jwt = require('jsonwebtoken');
 const jwt_secret = process.env['JWT_SECRET'];
 const bcrypt = require("bcrypt");
 const {extend} = require("lodash"); 
-
-
+const {Notification} = require("../models/notification.model");
+const {getTimeFormatted} = require("../utils/get-post-cleaned");
+ 
 const { User } = require("../models/user.model");
 const { SocialProfile } = require("../models/social-profile.model");
 

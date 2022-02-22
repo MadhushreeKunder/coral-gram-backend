@@ -1,4 +1,4 @@
-const getNameFromSocialProfile = (user) =>{
+const getNameFromSocialProfile = (user, viewerId) =>{
   console.log({user});
 
   user.name = user.userId.username;

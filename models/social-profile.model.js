@@ -13,7 +13,7 @@ const SocialProfileSchema = new Schema({
 
   avatar: {
     type: String,
-    default: 'https://bit.ly/broken-link',
+    default: 'https://www.k2e.com/wp-content/uploads/2018/09/person-icon.png',
   },
 
   userId: {
