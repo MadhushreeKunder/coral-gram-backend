@@ -1,7 +1,8 @@
 const express = require("express");
+const authVerify = require("../middlewares/auth-handler.middleware");
 const router = express.Router();
 
-const { authVerify } = require("../middlewares/auth-handler.middleware");
+
 const { getViewerDetailsFromDb } = require("../middlewares/get-viewer-details-from-db");
 
 const {getPostCleaned} = require("../utils/get-post-cleaned");
@@ -144,9 +145,9 @@ router.route('/:postId/likedby')
 .post(async (req, res) => {
   try {
     const {viewer} = req;
-
     let isLiked = false;
     const {postId} = req.params;
+    
     const post = await Post.findById(postId);
     if (!post){
       res.status(400).json({message: "No post found"});

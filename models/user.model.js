@@ -1,25 +1,38 @@
 var mongoose = require('mongoose');
-const {Schema} = mongoose;
+const { Schema } = mongoose;
 
 const UserSchema = new Schema({
 
-    email: {
-      type: String,
-      required: 'Email id is required',
-      unique: 'Account already exists for this email',
-    },
-
-    password: {
-      type: String,
-      required: 'Password is required',
-    },
-
-    username: {
-      type: String,
-      required: 'Username is required'
-    },
-
+  email: {
+    type: String,
+    required: 'Email id is required',
+    unique: 'Account already exists for this email',
+    validate: {
+      validator: function(value) {
+        return /^.+@.+\.com$/.test(value);
+      },
+      message: (props) => `${props.value} is not a valid email!`,
+    }
   },
+
+  password: {
+    type: String,
+    required: 'Password is required',
+    validate: {
+      validator: function (value) {
+      return /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/g.test(value);
+    },
+        message: (props) =>
+					`Password should contain 8 letters(atleast one number, one smallcase and uppercase alphabets)`,
+    }
+  },
+
+ username: {
+    type: String,
+    required: 'your name is required'
+  },
+
+},
   {
     timestamps: true,
   },

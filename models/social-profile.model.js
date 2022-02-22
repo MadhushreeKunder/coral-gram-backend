@@ -4,7 +4,7 @@ const { User} = require("./user.model");
 
 const SocialProfileSchema = new Schema({
 
-  username: {
+  userName: {
     type: String,
     unique: 'Username already exists',
     required: 'Username is required',

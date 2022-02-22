@@ -1,6 +1,7 @@
 const express = require('express');
+const authVerify = require("../middlewares/auth-handler.middleware");
 const router = express.Router();
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
 const jwt_secret = process.env['JWT_SECRET'];
 const bcrypt = require("bcrypt");
 const {extend} = require("lodash"); 
@@ -8,7 +9,7 @@ const {extend} = require("lodash");
 
 const { User } = require("../models/user.model");
 const { SocialProfile } = require("../models/social-profile.model");
-const { authVerify } = require("../middlewares/auth-handler.middleware");
+
 const { getViewerDetailsFromDb } = require("../middlewares/get-viewer-details-from-db");
 
 const { getNameFromSocialProfile } = require("../utils/get-name-from-social-profile");
@@ -21,13 +22,21 @@ router.post('/signup', async(req, res) => {
   try {
     const userData = req.body;
 
-    const user = await User.findOne({ email: UserData.email});
+    const user = await User.findOne({ email: userData.email});
 
     if (user) {
-      return res.status(409).json({success: false, message: "Account already exists"});
+      const viewer = await SocialProfile.findOne({userId: user._id})
+      if (viewer){
+        res.status(409).json({success: false, message: "Account already exists"});
+        return ;
+      }
+      res.status(409).json({
+        message: "Account already exist"
+      });
+      return;
     }
 
-    const userNameExists = await SocialProfile.findOne({userName: UserData.userName});
+    const userNameExists = await SocialProfile.findOne({userName: userData.userName});
 
     if(userNameExists){
       res.status(409).json({
@@ -138,11 +147,39 @@ router.route('/')
 });
 
 
+router.route('/notifications')
+.get(async (req, res) =>{
+  try {
+    const userId = req.viewer._id;
+
+    let notifications = await Notification.find(
+      {userId},
+      { activityUserId: 1, activityTitle: 1, likedPost: 1, createdAt: 1 }
+    ).lean()
+    .populate({path: 'activityUserId', select: 'userName avatar'})
+    .populate({path: 'likedPost', select: 'caption'})
+    .sort({createdAt: -1});
+
+    for (notification of notifications){
+      notification.time = getTimeFormatted(notification.createdAt);
+    }
+    res.status(200).json({response: notifications});
+
+  } catch(error){
+    console.log(error);
+    res.status(500).json({
+      message: 'Request failed, check error message for more details',
+      errorMessage: error.message
+    })
+  }
+});
+
+
 router.route('/:userName')
 .get(async (req, res)=> {
   try {
     const {viewer} = req;
-    const {username} = req.params;
+    const {userName} = req.params;
 
     let userDetails = await SocialProfile.findOne({ userName}).populate({
       path: 'userId',

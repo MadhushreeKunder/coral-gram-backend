@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 
-const {authVerify} = require("../middlewares/auth-handler.middleware");
+const authVerify = require("../middlewares/auth-handler.middleware");
 const {generateToken} = require('../utils/get-token');
 
 
@@ -21,7 +21,7 @@ router.route('/')
 
     const NewUser = new User(userData);
     const salt = await bcrypt.genSalt(10);
-    NewUSer.password = await bcrypt.hash(NewUser.password, salt);
+    NewUser.password = await bcrypt.hash(NewUser.password, salt);
 
     await NewUser.save();
 
@@ -48,7 +48,7 @@ router.route('/authenticate')
   try {
     const email = req.get('email');
     const password = req.get('password');
-    const user = await USer.findOne({email});
+    const user = await User.findOne({email});
 
     if(!user){
       res.status(403).json({
