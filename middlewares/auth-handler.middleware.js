@@ -9,7 +9,7 @@ const authVerify = async (req, res, next) => {
     const token = req.headers.authorization;
     const decoded = jwt.verify(token, jwt_secret);
 
-    userId: decoded.userId;
+    userId = decoded.userId;
     const user = await User.findById(userId);
 
     if (!user) {
