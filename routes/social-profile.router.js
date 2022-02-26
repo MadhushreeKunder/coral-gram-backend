@@ -365,7 +365,7 @@ router.route("/:userName/following")
       return;
     }
 
-    if (viewer.follower.includes(userDetails._id)){
+    if (viewer.followers.includes(userDetails._id)){
       viewer.followers = viewer.followers.filter((id) => id.toString() !== userDetails._id.toString(),
       );
       userDetails.following = userDetails.following.filter((id) => id.toString() !== viewer._id.toString());

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
+const User = require("../models/user.model");
 
 const authVerify = require("../middlewares/auth-handler.middleware");
 const {generateToken} = require('../utils/get-token');
